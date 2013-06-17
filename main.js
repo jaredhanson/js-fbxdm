@@ -11,9 +11,6 @@ function(exports, qs, guid, transports) {
   function create(config, cb) {
     cb = cb || function(){};
     
-    console.log('fbxdm.create');
-    console.log(config);
-    
     var name = transports.find()
       , transport = transports.get(name);
     if (transport) {
@@ -55,9 +52,6 @@ function(exports, qs, guid, transports) {
         message = qs.parse(message);
       }
     }
-    
-    console.log('!! ON MESSAGE');
-    console.log(message);
     
     if (message.xd_action) {
       if (!origin) { return; }
