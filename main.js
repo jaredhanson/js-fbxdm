@@ -1,12 +1,9 @@
 define(['exports',
+        'querystring',
         './lib/transports'],
-function(exports, transports) {
+function(exports, qs, transports) {
 
-  var onMessage = function(){};
-
-  function handler(fn) {
-    onMessage = fn;
-  }
+  var actions = {};
 
   function create(config, cb) {
     cb = cb || function(){};
@@ -21,8 +18,40 @@ function(exports, transports) {
       return name;
     }
   }
+
+  function action(name, handler) {
+    actions[name] = handler;
+  }
   
-  exports.handler = handler;
+  function onMessage(message, origin) {
+    // TODO: Check origin
+    
+    if (typeof message == 'string') {
+      // TODO: handle FB_RPC
+      
+      if (message.substring(0, 1) == '{') {
+        try {
+          message = JSON.parse(message);
+        } catch (_) {
+          return;
+        }
+      } else {
+        message = qs.parse(message);
+      }
+    }
+    
+    console.log('!! ON MESSAGE');
+    console.log(message);
+    
+    if (message.xd_action) {
+      if (!origin) { return; }
+      
+      var handler = actions[message.xd_action];
+      handler && handler(message);
+    }
+  };
+  
   exports.create = create;
+  exports.action = action;
   
 });
